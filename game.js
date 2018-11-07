@@ -91,6 +91,7 @@ function Update(dt) {
       asteroidSpeed = 3;
       asteroids = [];
       lasers = [];
+      noLasers = 0;
       document.getElementById('score').value = score;
     }
 
@@ -134,8 +135,6 @@ function Render(dt) {
   for (var i = 0; i < lasers.length; i++) {
     ctx.drawImage(lasers[i].image, lasers[i].x, lasers[i].y);
   }
-
-
 }
 
 function createAsteroid(x) {

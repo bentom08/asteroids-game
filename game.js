@@ -21,6 +21,7 @@ var asteroids = [];
 var count = 0;
 var asteroidSpeed = 2.5;
 var speedIncrease = 1.03;
+var noLaser = true;
 
 var lastUpdate = 0;
 var playerDirection = 0;
@@ -105,6 +106,7 @@ function Update(dt) {
     if (asteroids[i].x > laser.x - 32 && asteroids[i].x < laser.x + 4 && asteroids[i].y > laser.y - 24 && asteroids[i].y < laser.y + 24) {
       asteroids.splice(i, 1);
       score += 10;
+      noLaser = true;
       if (score >= 50) {
         asteroidSpeed *= speedIncrease;
       }
@@ -115,6 +117,9 @@ function Update(dt) {
   }
 
   laser.y -= 10;
+  if (laser.y < 0) {
+    noLaser = true;
+  }
 }
 
 function Render(dt) {
@@ -151,6 +156,7 @@ function createAsteroid(x) {
 }
 
 function fireLaser() {
-  laser.x = posX + 11;
-  laser.y = posY - 30;
+    laser.x = posX + 11;
+    laser.y = posY - 30;
+    noLaser = false;
 }

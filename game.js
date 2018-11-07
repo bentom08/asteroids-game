@@ -21,22 +21,11 @@ var asteroids = [];
 var count = 0;
 var asteroidSpeed = 2.5;
 var speedIncrease = 1.03;
-var noLaser = true;
+var noLasers = 0;
+var lasers = [];
 
 var lastUpdate = 0;
 var playerDirection = 0;
-
-var laser = {
-  image: new Image(),
-  x: -50,
-  y: 0
-}
-
-laser.image.onload = function() {
-  ctx.drawImage(laser.image, laser.x, laser.y);
-};
-
-laser.image.src = 'images/laser.png';
 
 var score = 0;
 
@@ -54,7 +43,7 @@ addEventListener("keydown",function(e)
       playerDirection = 10;
     } else if (e.keyCode == 37) {
       playerDirection = -10;
-    } else if (e.keyCode == 32 && noLaser) {
+    } else if (e.keyCode == 32 && noLasers < 2) {
       fireLaser();
     }
 });
@@ -97,30 +86,37 @@ function Update(dt) {
       if (document.getElementById('highscore').value < score) {
         document.getElementById('highscore').value = score;
       }
+      document.getElementById('lastscore').value = score;
       score = 0;
       asteroidSpeed = 3;
       asteroids = [];
+      lasers = [];
       document.getElementById('score').value = score;
     }
 
-    if (asteroids[i].x > laser.x - 32 && asteroids[i].x < laser.x + 4 && asteroids[i].y > laser.y - 24 && asteroids[i].y < laser.y + 24) {
-      asteroids.splice(i, 1);
-      score += 10;
-      noLaser = true;
-      if (score >= 50) {
-        asteroidSpeed *= speedIncrease;
+    for (var j = 0; j < lasers.length; j++) {
+      if (asteroids[i].x > lasers[j].x - 32 && asteroids[i].x < lasers[j].x + 4 && asteroids[i].y > lasers[j].y - 24 && asteroids[i].y < lasers[j].y + 24) {
+        asteroids.splice(i, 1);
+        score += 10;
+        lasers.splice(j, 1);
+        noLasers--;
+        if (score >= 50) {
+          asteroidSpeed *= speedIncrease;
+        }
+        document.getElementById('score').value = score;
       }
-      document.getElementById('score').value = score;
-
-      laser.x = -50;
+      }
+    }
+    for (var i = 0; i < lasers.length; i++) {
+      lasers[i].y -= 10;
+      if (lasers[i].y < 0) {
+        noLasers--;
+        lasers.splice(i, 1);
+      }
     }
   }
 
-  laser.y -= 10;
-  if (laser.y < 0) {
-    noLaser = true;
-  }
-}
+
 
 function Render(dt) {
   ctx.clearRect(0, 0 ,canvas.width, canvas.height);
@@ -135,8 +131,9 @@ function Render(dt) {
     ctx.drawImage(asteroids[i].image, asteroids[i].x, asteroids[i].y);
   }
 
-
-  ctx.drawImage(laser.image, laser.x, laser.y);
+  for (var i = 0; i < lasers.length; i++) {
+    ctx.drawImage(lasers[i].image, lasers[i].x, lasers[i].y);
+  }
 
 
 }
@@ -156,7 +153,19 @@ function createAsteroid(x) {
 }
 
 function fireLaser() {
-    laser.x = posX + 11;
-    laser.y = posY - 30;
-    noLaser = false;
+  noLasers++;
+
+  var laser = {
+    image: new Image(),
+    x: posX + 11,
+    y: posY - 30
+  }
+
+  laser.image.onload = function() {
+    ctx.drawImage(laser.image, laser.x, laser.y);
+  };
+
+  laser.image.src = 'images/laser.png';
+
+  lasers.push(laser);
 }
